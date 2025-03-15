@@ -23,7 +23,6 @@ button {
     margin-top: 10px;
     padding: 5px;
     width: 100%;
-    z-index: 1001;
     color: black;
 }
 
@@ -117,7 +116,7 @@ button.delete-button {
 }
 
 #overlay {
-    pointer-events: none; /* Allow clicks to pass through */
+    pointer-events: auto; /* Prevent clicks from passing through */
 }
 
 #countdownText {
