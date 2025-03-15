@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoTyper</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <h2>One Day At A Time</h2>
+  <video id="webcam" height="180" autoplay></video>
+
+  <textarea id="message" placeholder="Message for tomorrow..."></textarea>
+
+  <button id="startTyping">Save Entry</button>
+
+  <div id="library_button"><h3>Past Entries</h3></div>
+
+  <div id="carousel" class="carousel">
+    <button id="prev" class="carousel-button">❮</button>
+    <div id="carouselContent" class="carousel-content"></div>
+    <button id="next" class="carousel-button">❯</button>
+  </div>
+
+  <button id="createTimelapse">Create Timelapse</button>
+
+  <script src="popup.js"></script>
+
+</body>
+</html>
