@@ -245,11 +245,17 @@ document.getElementById('createTimelapse').addEventListener('click', createTimel
 //     overlay.appendChild(countdownText);
 //     document.body.appendChild(overlay);
 
-//     const now = new Date();
-//     const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-//     const updateCountdown = () => {
-//         const currentTime = new Date();
-//         const timeRemaining = nextDay - currentTime;
+    // const now = new Date();
+    // const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    
+    // Store the next available time in local storage for alert feature
+    chrome.storage.local.set({ nextAvailableTime: nextDay.getTime() }, () => {
+        console.log("Next available time stored:", nextDay);
+    });
+    
+    const updateCountdown = () => {
+        const currentTime = new Date();
+        const timeRemaining = nextDay - currentTime;
 
 //         const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
 //         const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
@@ -257,11 +263,14 @@ document.getElementById('createTimelapse').addEventListener('click', createTimel
 
 //         countdownText.textContent = `New entry in ${hours}h ${minutes}m ${seconds}s`;
 
-//         if (timeRemaining <= 0) {
-//             clearInterval(countdownInterval);
-//             document.body.removeChild(overlay);
-//         }
-//     };
+        if (timeRemaining <= 0) {
+            clearInterval(countdownInterval);
+            document.body.removeChild(overlay);
+            
+            // Show alert that user can now take a new picture
+            alert("You can now take a new picture!");
+        }
+    };
 
 //     updateCountdown();
 //     const countdownInterval = setInterval(updateCountdown, 1000);
@@ -270,11 +279,26 @@ document.getElementById('createTimelapse').addEventListener('click', createTimel
 // Function to check if an entry exists for the current date and show countdown if necessary
 function checkForExistingEntry() {
     const currentDate = new Date().toLocaleDateString();
-    chrome.storage.local.get({ entries: [] }, (result) => {
+    chrome.storage.local.get({ entries: [], nextAvailableTime: 0 }, (result) => {
         const entries = result.entries || [];
         const existingEntry = entries.find(entry => new Date(entry.date).toLocaleDateString() === currentDate);
+        
         if (existingEntry) {
             showCountdown();
+        } else {
+            // Check if we need to show an alert that the user can now take a new picture
+            const nextAvailableTime = result.nextAvailableTime;
+            const currentTime = new Date().getTime();
+            
+            if (nextAvailableTime && nextAvailableTime < currentTime) {
+                // Clear the stored next available time
+                chrome.storage.local.set({ nextAvailableTime: 0 }, () => {
+                    console.log("Cleared next available time");
+                });
+                
+                // Show alert that user can now take a new picture
+                alert("You can now take a new picture!");
+            }
         }
     });
 }
@@ -284,3 +308,37 @@ document.addEventListener('DOMContentLoaded', () => {
     displayStoredData();
     checkForExistingEntry();
 });
+
+// Setup background check for next available time to send notifications
+// This runs when the extension popup is opened
+function setupNotificationCheck() {
+    chrome.alarms.create('checkAvailability', { periodInMinutes: 1 });
+}
+
+// Add alarm listener to check if we need to send a notification
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'checkAvailability') {
+        chrome.storage.local.get({ nextAvailableTime: 0 }, (result) => {
+            const nextAvailableTime = result.nextAvailableTime;
+            const currentTime = new Date().getTime();
+            
+            if (nextAvailableTime && nextAvailableTime < currentTime && nextAvailableTime !== 0) {
+                // Clear the stored next available time to prevent repeat notifications
+                chrome.storage.local.set({ nextAvailableTime: 0 }, () => {
+                    console.log("Cleared next available time after sending notification");
+                });
+                
+                // Send notification
+                chrome.notifications.create({
+                    type: 'basic',
+                    iconUrl: 'icon48.png',  // Make sure you have this icon in your extension
+                    title: 'Daily Picture Reminder',
+                    message: 'You can now take a new picture!'
+                });
+            }
+        });
+    }
+});
+
+// Call setup when the extension loads
+setupNotificationCheck();
