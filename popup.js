@@ -17,11 +17,23 @@ document.getElementById("startTyping").addEventListener("click", () => {
     context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
     const imageData = canvas.toDataURL('image/png');
 
+    // Get the current date
+    const currentDate = new Date().toLocaleDateString();
+
     // Retrieve existing entries from local storage
     chrome.storage.local.get({ entries: [] }, (result) => {
         const entries = result.entries || [];
+
+        // Check if an entry already exists for the current date
+        const existingEntry = entries.find(entry => new Date(entry.date).toLocaleDateString() === currentDate);
+        // if (existingEntry) {
+        //     alert("You can only make one entry per day.");
+        //     return;
+        // }
+
         // Add the new entry
-        entries.push({ message, image: imageData });
+        const date = new Date().toLocaleString();
+        entries.push({ message, image: imageData, date });
 
         // Store the updated entries array in local storage
         chrome.storage.local.set({ entries }, () => {
@@ -89,16 +101,43 @@ function displayStoredData() {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = entry.message;
 
+            const dateDiv = document.createElement('div');
+            dateDiv.textContent = entry.date;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete Entry';
+            deleteButton.classList.add('delete-button');
+            deleteButton.addEventListener('click', () => deleteEntry(index));
+
             entryDiv.appendChild(img);
             entryDiv.appendChild(messageDiv);
+            entryDiv.appendChild(dateDiv);
+            entryDiv.appendChild(deleteButton);
             carouselContent.appendChild(entryDiv);
         });
     });
 }
 
-// Function to show the carousel
+// Function to delete an entry
+function deleteEntry(index) {
+    chrome.storage.local.get({ entries: [] }, (result) => {
+        let entries = result.entries || [];
+        entries.splice(index, 1); // Remove the entry at the specified index
+
+        // Store the updated entries array in local storage
+        chrome.storage.local.set({ entries }, () => {
+            console.log("Entry deleted from local storage.");
+            displayStoredData(); // Update the displayed entries
+        });
+    });
+}
+
+// Function to show the carousel and hide the camera and message input
 function showCarousel() {
     document.getElementById('carousel').style.display = 'block';
+    document.getElementById('webcam').style.display = 'none';
+    document.getElementById('message').style.display = 'none';
+    document.getElementById('startTyping').style.display = 'none';
     displayStoredData();
 }
 

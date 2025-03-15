@@ -105,3 +105,12 @@ video {
     right: 0;
     width: 10%;
 }
+
+button.delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
