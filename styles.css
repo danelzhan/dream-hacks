@@ -1,17 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap');
+
+
+
 * {
     color: white;
+    font-family: "Funnel Display", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    background-color: #CBC3E3;
 }
 
-textarea {
-    color: black;
-}
 
 body {
     width: 20rem;
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 10px;
-    background-color: #111111;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 209, 163, 0.6) 5%, rgba(251, 155, 178, 0.6) 20%, rgba(113, 74, 123, 0) 75.5%, rgba(0, 0, 0, 0) 100%);
 }
 
 textarea {
@@ -23,8 +28,15 @@ button {
     margin-top: 10px;
     padding: 5px;
     width: 100%;
-    color: black;
+    border-radius: 1rem;
+    
 }
+
+button:hover {
+    color: white;
+    background-color: #2B4676;
+}
+
 
 video {
     margin-top: 10px;

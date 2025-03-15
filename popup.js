@@ -203,7 +203,7 @@ function createTimelapse() {
                     img.onload = () => {
                         context.drawImage(img, 0, 0, canvas.width, canvas.height);
                         index++;
-                        setTimeout(drawNextImage, 100); // Adjust the delay as needed
+                        setTimeout(drawNextImage, 250); // Adjust the delay as needed
                     };
                 } else {
                     recorder.stop();
@@ -245,17 +245,17 @@ document.getElementById('createTimelapse').addEventListener('click', createTimel
 //     overlay.appendChild(countdownText);
 //     document.body.appendChild(overlay);
 
-    // const now = new Date();
-    // const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+//     const now = new Date();
+//     const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     
-    // Store the next available time in local storage for alert feature
-    chrome.storage.local.set({ nextAvailableTime: nextDay.getTime() }, () => {
-        console.log("Next available time stored:", nextDay);
-    });
+//     // Store the next available time in local storage for alert feature
+//     chrome.storage.local.set({ nextAvailableTime: nextDay.getTime() }, () => {
+//         console.log("Next available time stored:", nextDay);
+//     });
     
-    const updateCountdown = () => {
-        const currentTime = new Date();
-        const timeRemaining = nextDay - currentTime;
+//     const updateCountdown = () => {
+//         const currentTime = new Date();
+//         const timeRemaining = nextDay - currentTime;
 
 //         const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
 //         const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
@@ -263,14 +263,14 @@ document.getElementById('createTimelapse').addEventListener('click', createTimel
 
 //         countdownText.textContent = `New entry in ${hours}h ${minutes}m ${seconds}s`;
 
-        if (timeRemaining <= 0) {
-            clearInterval(countdownInterval);
-            document.body.removeChild(overlay);
+//         if (timeRemaining <= 0) {
+//             clearInterval(countdownInterval);
+//             document.body.removeChild(overlay);
             
-            // Show alert that user can now take a new picture
-            alert("You can now take a new picture!");
-        }
-    };
+//             // Show alert that user can now take a new picture
+//             alert("You can now take a new picture!");
+//         }
+//     };
 
 //     updateCountdown();
 //     const countdownInterval = setInterval(updateCountdown, 1000);
@@ -340,5 +340,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     }
 });
 
+
+
 // Call setup when the extension loads
-setupNotificationCheck();
+document.addEventListener('DOMContentLoaded', () => {
+    displayStoredData();
+    checkForExistingEntry();
+})
