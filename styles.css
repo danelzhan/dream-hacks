@@ -23,6 +23,7 @@ button {
     margin-top: 10px;
     padding: 5px;
     width: 100%;
+    z-index: 1001;
     color: black;
 }
 
@@ -113,4 +114,14 @@ button.delete-button {
     padding: 5px;
     cursor: pointer;
     margin-top: 10px;
+}
+
+#overlay {
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+#countdownText {
+    font-size: 18px; /* Adjust font size to fit in one line */
+    margin-bottom: 20px;
+    text-align: center; /* Center align the text */
 }

@@ -26,10 +26,10 @@ document.getElementById("startTyping").addEventListener("click", () => {
 
         // Check if an entry already exists for the current date
         const existingEntry = entries.find(entry => new Date(entry.date).toLocaleDateString() === currentDate);
-        // if (existingEntry) {
-        //     alert("You can only make one entry per day.");
-        //     return;
-        // }
+        if (existingEntry) {
+            showCountdown();
+            return;
+        }
 
         // Add the new entry
         const date = new Date().toLocaleString();
@@ -225,5 +225,68 @@ function createTimelapse() {
 // Event listener for creating a timelapse video
 document.getElementById('createTimelapse').addEventListener('click', createTimelapse);
 
-// Call the function to display the stored entries when the popup is opened
-document.addEventListener('DOMContentLoaded', displayStoredData);
+// Function to show a countdown timer until the next day
+function showCountdown() {
+    const overlay = document.createElement('div');
+    overlay.id = 'overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.color = 'white';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '1000';
+
+    const countdownText = document.createElement('div');
+    countdownText.id = 'countdownText';
+    countdownText.style.fontSize = '18px'; // Adjust font size to fit in one line
+    countdownText.style.marginBottom = '20px';
+    countdownText.style.textAlign = 'center'; // Center align the text
+
+    overlay.appendChild(countdownText);
+    document.body.appendChild(overlay);
+
+    const now = new Date();
+    const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const updateCountdown = () => {
+        const currentTime = new Date();
+        const timeRemaining = nextDay - currentTime;
+
+        const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+        countdownText.textContent = `New entry in ${hours}h ${minutes}m ${seconds}s`;
+
+        if (timeRemaining <= 0) {
+            clearInterval(countdownInterval);
+            document.body.removeChild(overlay);
+        }
+    };
+
+    updateCountdown();
+    const countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Function to check if an entry exists for the current date and show countdown if necessary
+function checkForExistingEntry() {
+    const currentDate = new Date().toLocaleDateString();
+    chrome.storage.local.get({ entries: [] }, (result) => {
+        const entries = result.entries || [];
+        const existingEntry = entries.find(entry => new Date(entry.date).toLocaleDateString() === currentDate);
+        if (existingEntry) {
+            showCountdown();
+        }
+    });
+}
+
+// Call the function to display the stored entries and check for existing entry when the popup is opened
+document.addEventListener('DOMContentLoaded', () => {
+    displayStoredData();
+    checkForExistingEntry();
+});
